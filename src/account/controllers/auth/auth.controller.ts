@@ -7,12 +7,19 @@ import {
 import { ApiResponse } from '@nestjs/swagger';
 import { AuthResponseDto } from 'src/account/dtos/auth-response.dto';
 import { CreateUserDto } from 'src/account/dtos/create-user.dto';
+import { ForgotPasswordDto } from 'src/account/dtos/forgot-password';
 import { LoginUserDto } from 'src/account/dtos/login.dto';
+import { ResetPasswordDto } from 'src/account/dtos/reset-password.dto';
+import { UserToken } from 'src/account/entities/user-token/user-token';
+import { UserTokenService } from 'src/account/services/user-token/user-token.service';
 import { UserService } from 'src/account/services/user/user.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly userTokenService: UserTokenService
+  ) {}
 
   @ApiResponse({ type: AuthResponseDto, status: 201 })
   @Post('/register')
@@ -37,24 +44,32 @@ export class AuthController {
   }
 
   //forget password
+  @ApiResponse({ status: 200 })
   @Post('/forgot-password')
-  async forgotPassword(newPassword: string, email: string) {
+  @HttpCode(200)
+  async forgotPassword(data: ResetPasswordDto) {
     //find user
-    const user = await this.userService.findByEmail(email);
+    const user = await this.userService.findByEmail(data.email);
     if (!user) {
       throw new BadRequestException(
         'There is no account linked to this email address'
       );
     }
     // generate password reset link
-
+    const resetToken = this.userTokenService.createUserToken(
+      data.email,
+      'reset-password'
+    );
     // send password reset link to user email
 
     // return message dto that email sent
+    return resetToken;
   }
 
   //reset password
-
+  @Post('/reset-password')
+  resetPassword(data: ForgotPasswordDto) {}
   // send email verification link
+
   //verify email
 }
