@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Controller,
   HttpCode,
+  NotFoundException,
   Post
 } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
@@ -10,7 +11,8 @@ import { CreateUserDto } from 'src/account/dtos/create-user.dto';
 import { ForgotPasswordDto } from 'src/account/dtos/forgot-password';
 import { LoginUserDto } from 'src/account/dtos/login.dto';
 import { ResetPasswordDto } from 'src/account/dtos/reset-password.dto';
-import { UserToken } from 'src/account/entities/user-token/user-token';
+import { VerifyEmailDto } from 'src/account/dtos/verify-email.dto';
+
 import { UserTokenService } from 'src/account/services/user-token/user-token.service';
 import { UserService } from 'src/account/services/user/user.service';
 
@@ -67,9 +69,65 @@ export class AuthController {
   }
 
   //reset password
+  @ApiResponse({ status: 200 })
   @Post('/reset-password')
-  resetPassword(data: ForgotPasswordDto) {}
+  @HttpCode(200)
+  async resetPassword(data: ResetPasswordDto) {
+    //check whether user exists by Email
+    const user = await this.userService.findByEmail(data.email);
+    if (!user) {
+      throw new NotFoundException('No User Found with this Email');
+    }
+
+    //verify token
+    const isTokenValid = await this.userTokenService.verifyToken(
+      data.email,
+      'reset',
+      data.token
+    );
+    if (!isTokenValid) {
+      throw new BadRequestException('Token is expired or invalid');
+    }
+    //update password
+    const updatedUser = await this.userService.updatePassword(
+      user.id,
+      data.password
+    );
+    return updatedUser;
+  }
+
   // send email verification link
+  @ApiResponse({ status: 200 })
+  @Post('/verify-user')
+  @HttpCode(200)
+  async verifyUser(email: string) {
+    const user = await this.userService.findByEmail(email);
+    if (!user) {
+      throw new NotFoundException('No user found with this Email');
+    }
+    //generate token
+    const verificationToken = await this.userTokenService.createUserToken(
+      email,
+      'Verify User'
+    );
+    // send email with load mailer
+  }
 
   //verify email
+  @ApiResponse({ status: 200 })
+  @Post('/verify-email')
+  @HttpCode(200)
+  async verifyEmail(data: VerifyEmailDto) {
+    //verify token
+    const verifyToken = await this.userTokenService.verifyToken(
+      data.email,
+      'verify email',
+      data.token
+    );
+    if (!verifyToken) {
+      throw new BadRequestException('Token is Invalid or Expired');
+    }
+    //return token
+    return verifyToken;
+  }
 }
