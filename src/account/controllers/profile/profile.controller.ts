@@ -67,6 +67,7 @@ export class ProfileController {
     req: Request
   ) {
     const user = await this.userService.findByEmail(req.user.email);
+
     if (!user) {
       throw new NotFoundException('User does not exist with this Email');
     }
@@ -77,9 +78,10 @@ export class ProfileController {
     if (!validHash) {
       throw new ForbiddenException('Old Password is not correct');
     }
+    const passwordHash = await this.bcryptService.makeHash(data.newPassword);
     const updatedPassword = await this.userService.updatePassword(
       req.user._id,
-      data.newPassword
+      passwordHash
     );
     return { message: 'password updated Successfully' };
   }
