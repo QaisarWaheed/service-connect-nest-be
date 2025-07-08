@@ -37,6 +37,10 @@ export class User extends Entity {
   @ApiProperty({ enum: Role, enumName: 'Role' })
   @Prop({ enum: Role, default: Role.StandardUser })
   role: Role;
+
+  @ApiProperty()
+  @Prop({ type: Date })
+  emailVerifiedAt: Date;
 }
 export type UserDocument = HydratedDocument<User>;
 export const UserSchema = SchemaFactory.createForClass(User);

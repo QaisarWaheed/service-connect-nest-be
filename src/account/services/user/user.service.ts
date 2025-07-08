@@ -72,4 +72,17 @@ export class UserService {
     const accessToken = await this.jwtService.signAsync(payload);
     return { accessToken, user };
   }
+
+  async markEmailVerified(email: string) {
+    const user = await this.userModel.findOneAndUpdate(
+      { email },
+      {
+        emailVerifiedAt: new Date()
+      },
+      {
+        new: true
+      }
+    );
+    return user;
+  }
 }

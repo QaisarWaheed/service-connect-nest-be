@@ -12,9 +12,11 @@ import { ForgotPasswordDto } from 'src/account/dtos/forgot-password';
 import { LoginUserDto } from 'src/account/dtos/login.dto';
 import { ResetPasswordDto } from 'src/account/dtos/reset-password.dto';
 import { VerifyEmailDto } from 'src/account/dtos/verify-email.dto';
+import { User } from 'src/account/entities/user/user';
 
 import { UserTokenService } from 'src/account/services/user-token/user-token.service';
 import { UserService } from 'src/account/services/user/user.service';
+import { MessageDto } from 'src/common/dtos/message.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -49,7 +51,7 @@ export class AuthController {
   @ApiResponse({ status: 200 })
   @Post('/forgot-password')
   @HttpCode(200)
-  async forgotPassword(data: ResetPasswordDto) {
+  async forgotPassword(data: ResetPasswordDto): Promise<string> {
     //find user
     const user = await this.userService.findByEmail(data.email);
     if (!user) {
@@ -72,7 +74,7 @@ export class AuthController {
   @ApiResponse({ status: 200 })
   @Post('/reset-password')
   @HttpCode(200)
-  async resetPassword(data: ResetPasswordDto) {
+  async resetPassword(data: ResetPasswordDto): Promise<MessageDto> {
     //check whether user exists by Email
     const user = await this.userService.findByEmail(data.email);
     if (!user) {
@@ -93,7 +95,7 @@ export class AuthController {
       user.id,
       data.password
     );
-    return updatedUser;
+    return { message: 'your password is updated' };
   }
 
   // send email verification link
@@ -117,7 +119,7 @@ export class AuthController {
   @ApiResponse({ status: 200 })
   @Post('/verify-email')
   @HttpCode(200)
-  async verifyEmail(data: VerifyEmailDto) {
+  async verifyEmail(data: VerifyEmailDto): Promise<{ message }> {
     //verify token
     const verifyToken = await this.userTokenService.verifyToken(
       data.email,
@@ -127,7 +129,8 @@ export class AuthController {
     if (!verifyToken) {
       throw new BadRequestException('Token is Invalid or Expired');
     }
-    //return token
-    return verifyToken;
+    // set emailVerifiedAt: new Date
+    const emailVerified = await this.userService.markEmailVerified(data.email);
+    return { message: 'Email verified' };
   }
 }
