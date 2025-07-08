@@ -1,11 +1,12 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   HttpCode,
   NotFoundException,
   Post
 } from '@nestjs/common';
-import { ApiResponse } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthResponseDto } from 'src/account/dtos/auth-response.dto';
 import { CreateUserDto } from 'src/account/dtos/create-user.dto';
 import { ForgotPasswordDto } from 'src/account/dtos/forgot-password';
@@ -17,7 +18,7 @@ import { User } from 'src/account/entities/user/user';
 import { UserTokenService } from 'src/account/services/user-token/user-token.service';
 import { UserService } from 'src/account/services/user/user.service';
 import { MessageDto } from 'src/common/dtos/message.dto';
-
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -28,7 +29,7 @@ export class AuthController {
   @ApiResponse({ type: AuthResponseDto, status: 201 })
   @Post('/register')
   @HttpCode(201)
-  async register(data: CreateUserDto): Promise<AuthResponseDto> {
+  async register(@Body() data: CreateUserDto): Promise<AuthResponseDto> {
     // check if email is available
     await this.userService.checkEmailAvailability(data.email);
     //create new User
@@ -40,9 +41,11 @@ export class AuthController {
   @ApiResponse({ type: AuthResponseDto, status: 200 })
   @Post('/login')
   @HttpCode(200)
-  async login(data: LoginUserDto): Promise<AuthResponseDto> {
+  async login(@Body() data: LoginUserDto): Promise<AuthResponseDto> {
     // find user by email
+
     const user = await this.userService.authenticate(data);
+    console.log(user);
     // sign user and return
     return await this.userService.signUser(user);
   }
@@ -51,7 +54,7 @@ export class AuthController {
   @ApiResponse({ status: 200 })
   @Post('/forgot-password')
   @HttpCode(200)
-  async forgotPassword(data: ResetPasswordDto): Promise<string> {
+  async forgotPassword(@Body() data: ResetPasswordDto): Promise<string> {
     //find user
     const user = await this.userService.findByEmail(data.email);
     if (!user) {
@@ -74,7 +77,7 @@ export class AuthController {
   @ApiResponse({ status: 200 })
   @Post('/reset-password')
   @HttpCode(200)
-  async resetPassword(data: ResetPasswordDto): Promise<MessageDto> {
+  async resetPassword(@Body() data: ResetPasswordDto): Promise<MessageDto> {
     //check whether user exists by Email
     const user = await this.userService.findByEmail(data.email);
     if (!user) {
@@ -102,7 +105,7 @@ export class AuthController {
   @ApiResponse({ status: 200 })
   @Post('/verify-user')
   @HttpCode(200)
-  async verifyUser(email: string) {
+  async verifyUser(@Body() email: string) {
     const user = await this.userService.findByEmail(email);
     if (!user) {
       throw new NotFoundException('No user found with this Email');
@@ -119,7 +122,7 @@ export class AuthController {
   @ApiResponse({ status: 200 })
   @Post('/verify-email')
   @HttpCode(200)
-  async verifyEmail(data: VerifyEmailDto): Promise<{ message }> {
+  async verifyEmail(@Body() data: VerifyEmailDto): Promise<{ message }> {
     //verify token
     const verifyToken = await this.userTokenService.verifyToken(
       data.email,

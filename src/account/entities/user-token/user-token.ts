@@ -1,4 +1,5 @@
-import { Prop, Schema } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument } from 'mongoose';
 import { Entity } from 'src/common/classes/base.entity.dto';
 
 @Schema({
@@ -17,3 +18,5 @@ export class UserToken extends Entity {
   @Prop({ type: Date })
   expiry: Date;
 }
+export type UserTokenDocument = HydratedDocument<UserToken>;
+export const UserTokenSchema = SchemaFactory.createForClass(UserToken);

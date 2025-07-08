@@ -37,7 +37,7 @@ export class UserService {
   }
 
   async findOneById(id: string) {
-    return await this.userModel.findOne({ id });
+    return await this.userModel.findById(id);
   }
 
   async findByEmail(email: string) {
@@ -45,9 +45,15 @@ export class UserService {
   }
 
   async updateUser(userId: string, data: UpdateUserDto) {
-    const updatedUser = await this.userModel.findByIdAndUpdate(userId, {
-      data
-    });
+    const updatedUser = await this.userModel.findByIdAndUpdate(
+      userId,
+      {
+        ...data
+      },
+      {
+        new: true
+      }
+    );
     return updatedUser;
   }
 
@@ -58,13 +64,20 @@ export class UserService {
     });
   }
 
-  async authenticate({ email, password }: LoginUserDto) {
-    const user = await this.userModel.findOne({ email });
+  async authenticate(data: LoginUserDto) {
+    const user = await this.userModel
+      .findOne({ email: data.email })
+      .select('+passwordHash');
+
+    console.log(user);
     if (!user) {
       throw new UnauthorizedException();
     }
 
-    const isValid = this.bcryptService.compareHash(password, user.passwordHash);
+    const isValid = this.bcryptService.compareHash(
+      data.password,
+      user.passwordHash
+    );
 
     if (!isValid) {
       throw new UnauthorizedException();

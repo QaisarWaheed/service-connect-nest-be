@@ -6,13 +6,13 @@ import { MongooseModule } from '@nestjs/mongoose';
 
 import { CommonModule } from './common/common.module';
 import { JwtModule } from '@nestjs/jwt';
+import { jwtConstants } from './account/constants/constant';
 
 @Module({
   imports: [
-    JwtModule,
     AccountModule,
     MailerModule,
-    MongooseModule.forRoot('mongodb://127.0.0.1:27017'),
+    MongooseModule.forRoot('mongodb://127.0.0.1:27017/service'),
     CommonModule
   ],
   controllers: [],

@@ -9,6 +9,7 @@ async function bootstrap() {
     .setDescription('The service-connect API description')
     .setVersion('1.0')
     .addTag('service-connect')
+    .addBearerAuth()
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, documentFactory);
