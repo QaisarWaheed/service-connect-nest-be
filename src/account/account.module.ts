@@ -8,6 +8,8 @@ import { ProfileController } from './controllers/profile/profile.controller';
 import { UserTokenService } from './services/user-token/user-token.service';
 import { JwtService } from '@nestjs/jwt';
 import { PasswordResetService } from './services/password-reset/password-reset.service';
+import { GuardController } from './controllers/guard/guard.controller';
+import { GuardService } from './services/guard/guard.service';
 
 @Module({
   imports: [
@@ -19,7 +21,7 @@ import { PasswordResetService } from './services/password-reset/password-reset.s
       }
     ])
   ],
-  providers: [UserService, UserTokenService, PasswordResetService],
-  controllers: [AuthController, ProfileController]
+  providers: [UserService, UserTokenService, PasswordResetService, GuardService],
+  controllers: [AuthController, ProfileController, GuardController]
 })
 export class AccountModule {}

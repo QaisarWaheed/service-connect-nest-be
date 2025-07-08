@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
   UnauthorizedException
@@ -10,6 +11,7 @@ import { Model } from 'mongoose';
 import { AuthResponseDto } from 'src/account/dtos/auth-response.dto';
 import { CreateUserDto } from 'src/account/dtos/create-user.dto';
 import { LoginUserDto } from 'src/account/dtos/login.dto';
+import { UpdateUserDto } from 'src/account/dtos/update-user.dto';
 import { AuthUser, User } from 'src/account/entities/user/user';
 import { BcryptService } from 'src/common/services/bcrypt/bcrypt.service';
 
@@ -34,8 +36,19 @@ export class UserService {
     return createdUser;
   }
 
+  async findOneById(id: string) {
+    return await this.userModel.findOne({ id });
+  }
+
   async findByEmail(email: string) {
     return await this.userModel.findOne({ email });
+  }
+
+  async updateUser(userId: string, data: UpdateUserDto) {
+    const updatedUser = await this.userModel.findByIdAndUpdate(userId, {
+      data
+    });
+    return updatedUser;
   }
 
   async updatePassword(userId: string, plainPassword: string) {
