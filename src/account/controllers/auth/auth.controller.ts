@@ -9,21 +9,22 @@ import {
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthResponseDto } from 'src/account/dtos/auth-response.dto';
 import { CreateUserDto } from 'src/account/dtos/create-user.dto';
-import { ForgotPasswordDto } from 'src/account/dtos/forgot-password';
 import { LoginUserDto } from 'src/account/dtos/login.dto';
 import { ResetPasswordDto } from 'src/account/dtos/reset-password.dto';
 import { VerifyEmailDto } from 'src/account/dtos/verify-email.dto';
-import { User } from 'src/account/entities/user/user';
 
 import { UserTokenService } from 'src/account/services/user-token/user-token.service';
 import { UserService } from 'src/account/services/user/user.service';
 import { MessageDto } from 'src/common/dtos/message.dto';
+import { MailerService } from 'src/mailer/mail.service';
+
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly userService: UserService,
-    private readonly userTokenService: UserTokenService
+    private readonly userTokenService: UserTokenService,
+    private readonly mailService: MailerService
   ) {}
 
   @ApiResponse({ type: AuthResponseDto, status: 201 })
@@ -63,12 +64,12 @@ export class AuthController {
       );
     }
     // generate password reset link
-    const resetToken = this.userTokenService.createUserToken(
+    const resetToken = await this.userTokenService.createUserToken(
       data.email,
       'reset-password'
     );
     // send password reset link to user email
-
+    await this.mailService.sendMail(data.email, 'reset-password', resetToken);
     // return message dto that email sent
     return resetToken;
   }
@@ -116,6 +117,11 @@ export class AuthController {
       'Verify User'
     );
     // send email with load mailer
+    await this.mailService.sendMail(
+      email,
+      'verify-user',
+      'password-reset-link'
+    );
   }
 
   //verify email
