@@ -39,6 +39,10 @@ export class Tasks {
   @Prop({ type: Number, min: -90, max: +90 })
   lat: number;
 
+  @ApiProperty({ type: String })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', unique: true })
+  userId: mongoose.Schema.Types.ObjectId;
+
   declare createdAt: Date;
   declare updatedAt: Date;
 }

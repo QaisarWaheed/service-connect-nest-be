@@ -45,10 +45,10 @@ export class UserTokenService {
       throw new BadRequestException('Invalid or expired token');
     }
 
-    // const isExpired = userToken.expiry < dayjs().toDate();
-    // if (isExpired) {
-    //   throw new BadRequestException('Invalid or expired token');
-    // }
+    const isExpired = userToken.expiry < dayjs().toDate();
+    if (isExpired) {
+      throw new BadRequestException('Invalid or expired token');
+    }
     const isHashValid = await this.bcryptService.compareHash(
       plainToken,
       userToken.hash

@@ -1,7 +1,7 @@
-import { UpdateTask } from './update-task';
+import { UpdateTaskDto } from './update-task';
 
 describe('UpdateTask', () => {
   it('should be defined', () => {
-    expect(new UpdateTask()).toBeDefined();
+    expect(new UpdateTaskDto()).toBeDefined();
   });
 });

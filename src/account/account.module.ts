@@ -13,6 +13,7 @@ import { jwtConstants } from './constants/constant';
 import { MailerModule } from 'src/mailer/mailer.module';
 import { TasksController } from '../task/controllers/tasks/tasks.controller';
 import { TasksService } from '../task/services/tasks/tasks.service';
+import TasksSchema, { Tasks } from 'src/task/entity/tasks/tasks.entity';
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { TasksService } from '../task/services/tasks/tasks.service';
       {
         name: UserToken.name,
         schema: UserTokenSchema
-      }
+      },
+      { name: Tasks.name, schema: TasksSchema }
     ])
   ],
   providers: [UserService, UserTokenService],
