@@ -7,12 +7,14 @@ import { CommonModule } from 'src/common/common.module';
 import { ProfileController } from './controllers/profile/profile.controller';
 import { UserTokenService } from './services/user-token/user-token.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
-import { BcryptService } from 'src/common/services/bcrypt/bcrypt.service';
+
 import { UserToken, UserTokenSchema } from './entities/user-token/user-token';
 import { jwtConstants } from './constants/constant';
+import { MailerModule } from 'src/mailer/mailer.module';
 
 @Module({
   imports: [
+    MailerModule,
     JwtModule.register({
       secret: jwtConstants.secret
     }),

@@ -13,17 +13,20 @@ import { ForgotPasswordDto } from 'src/account/dtos/forgot-password';
 import { LoginUserDto } from 'src/account/dtos/login.dto';
 import { ResetPasswordDto } from 'src/account/dtos/reset-password.dto';
 import { VerifyEmailDto } from 'src/account/dtos/verify-email.dto';
-import { User } from 'src/account/entities/user/user';
+import { UserTokenType } from 'src/account/entities/user-token/user-token';
 
 import { UserTokenService } from 'src/account/services/user-token/user-token.service';
 import { UserService } from 'src/account/services/user/user.service';
 import { MessageDto } from 'src/common/dtos/message.dto';
+import { MailerService } from 'src/mailer/mail.service';
+
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly userService: UserService,
-    private readonly userTokenService: UserTokenService
+    private readonly userTokenService: UserTokenService,
+    private readonly mailService: MailerService
   ) {}
 
   @ApiResponse({ type: AuthResponseDto, status: 201 })
@@ -54,7 +57,7 @@ export class AuthController {
   @ApiResponse({ status: 200 })
   @Post('/forgot-password')
   @HttpCode(200)
-  async forgotPassword(@Body() data: ResetPasswordDto): Promise<string> {
+  async forgotPassword(@Body() data: ForgotPasswordDto): Promise<string> {
     //find user
     const user = await this.userService.findByEmail(data.email);
     if (!user) {
@@ -63,12 +66,12 @@ export class AuthController {
       );
     }
     // generate password reset link
-    const resetToken = this.userTokenService.createUserToken(
+    const resetToken = await this.userTokenService.createUserToken(
       data.email,
-      'forgot-password'
+      UserTokenType.ResetPassword
     );
     // send password reset link to user email
-
+    await this.mailService.sendMail(data.email, 'Reset Password', resetToken);
     // return message dto that email sent
     return resetToken;
   }
@@ -88,7 +91,7 @@ export class AuthController {
     console.log(data.email, data.token);
     const isTokenValid = await this.userTokenService.verifyToken(
       data.email,
-      'reset',
+      UserTokenType.ResetPassword,
       data.token
     );
     if (!isTokenValid) {
@@ -111,9 +114,14 @@ export class AuthController {
     //generate token
     const verificationToken = await this.userTokenService.createUserToken(
       email,
-      'Verify User'
+      UserTokenType.VerifyEmail
     );
     // send email with load mailer
+    await this.mailService.sendMail(
+      email,
+      'Verify User',
+      'password-reset-link'
+    );
   }
 
   //verify email
@@ -124,7 +132,7 @@ export class AuthController {
     //verify token
     const verifyToken = await this.userTokenService.verifyToken(
       data.email,
-      'verify email',
+      UserTokenType.VerifyEmail,
       data.token
     );
     if (!verifyToken) {

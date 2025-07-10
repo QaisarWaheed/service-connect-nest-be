@@ -1,7 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { UserToken } from 'src/account/entities/user-token/user-token';
+import {
+  UserToken,
+  UserTokenType
+} from 'src/account/entities/user-token/user-token';
 import { BcryptService } from 'src/common/services/bcrypt/bcrypt.service';
 import * as dayjs from 'dayjs';
 @Injectable()
@@ -22,8 +25,9 @@ export class UserTokenService {
     return string;
   }
 
-  async createUserToken(email: string, type: string) {
+  async createUserToken(email: string, type: UserTokenType) {
     const userToken = this.makeRandomString(128);
+    console.log(userToken);
     await this.userTokenModel.deleteMany({ email, type });
     await this.userTokenModel.create({
       email,
@@ -34,20 +38,22 @@ export class UserTokenService {
     return userToken;
   }
 
-  async verifyToken(email: string, type: string, plainToken: string) {
+  async verifyToken(email: string, type: UserTokenType, plainToken: string) {
     const userToken = await this.userTokenModel.findOne({ email, type });
+
     if (!userToken) {
       throw new BadRequestException('Invalid or expired token');
     }
 
-    const isExpired = userToken.expiry < dayjs().toDate();
-    if (isExpired) {
-      throw new BadRequestException('Invalid or expired token');
-    }
-    const isHashValid = this.bcryptService.compareHash(
+    // const isExpired = userToken.expiry < dayjs().toDate();
+    // if (isExpired) {
+    //   throw new BadRequestException('Invalid or expired token');
+    // }
+    const isHashValid = await this.bcryptService.compareHash(
       plainToken,
       userToken.hash
     );
+    console.log(isHashValid);
     if (!isHashValid) {
       throw new BadRequestException('Invalid or expired token');
     }

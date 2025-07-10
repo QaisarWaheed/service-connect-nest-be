@@ -2,6 +2,11 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { Entity } from 'src/common/classes/base.entity.dto';
 
+export enum UserTokenType {
+  ResetPassword = 'reset-password',
+  VerifyEmail = 'verify-email'
+}
+
 @Schema({
   timestamps: true
 })
@@ -15,8 +20,8 @@ export class UserToken extends Entity {
   @Prop({ type: String })
   token: string;
 
-  @Prop({ type: String })
-  type: string;
+  @Prop({ enum: UserTokenType })
+  type: UserTokenType;
 
   @Prop({ type: Date })
   expiry: Date;
