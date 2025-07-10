@@ -16,7 +16,7 @@ export class UserTokenService {
     const chars = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     let string = '';
     for (let i = 1; i <= size; i++) {
-      const index = Math.random() * chars.length;
+      const index = Math.floor(Math.random() * chars.length);
       string += chars[index];
     }
     return string;
@@ -24,6 +24,7 @@ export class UserTokenService {
 
   async createUserToken(email: string, type: string) {
     const userToken = this.makeRandomString(128);
+    console.log(userToken);
     await this.userTokenModel.deleteMany({ email, type });
     await this.userTokenModel.create({
       email,
