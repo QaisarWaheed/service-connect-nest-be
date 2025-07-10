@@ -16,7 +16,7 @@ export class UserTokenService {
     const chars = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     let string = '';
     for (let i = 1; i <= size; i++) {
-      const index = Math.random() * chars.length;
+      const index = Math.floor(Math.random() * chars.length);
       string += chars[index];
     }
     return string;
@@ -39,6 +39,7 @@ export class UserTokenService {
     if (!userToken) {
       throw new BadRequestException('Invalid or expired token');
     }
+
     const isExpired = userToken.expiry < dayjs().toDate();
     if (isExpired) {
       throw new BadRequestException('Invalid or expired token');

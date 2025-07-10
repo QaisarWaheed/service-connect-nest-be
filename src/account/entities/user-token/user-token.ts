@@ -13,6 +13,9 @@ export class UserToken extends Entity {
   hash: string;
 
   @Prop({ type: String })
+  token: string;
+
+  @Prop({ type: String })
   type: string;
 
   @Prop({ type: Date })

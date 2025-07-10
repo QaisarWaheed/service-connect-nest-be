@@ -65,7 +65,7 @@ export class AuthController {
     // generate password reset link
     const resetToken = this.userTokenService.createUserToken(
       data.email,
-      'reset-password'
+      'forgot-password'
     );
     // send password reset link to user email
 
@@ -85,6 +85,7 @@ export class AuthController {
     }
 
     //verify token
+    console.log(data.email, data.token);
     const isTokenValid = await this.userTokenService.verifyToken(
       data.email,
       'reset',
@@ -94,10 +95,7 @@ export class AuthController {
       throw new BadRequestException('Token is expired or invalid');
     }
     //update password
-    const updatedUser = await this.userService.updatePassword(
-      user.id,
-      data.password
-    );
+    await this.userService.updatePassword(user.id, data.password);
     return { message: 'your password is updated' };
   }
 
