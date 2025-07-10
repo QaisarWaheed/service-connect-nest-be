@@ -11,6 +11,8 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import { UserToken, UserTokenSchema } from './entities/user-token/user-token';
 import { jwtConstants } from './constants/constant';
 import { MailerModule } from 'src/mailer/mailer.module';
+import { TasksController } from '../task/controllers/tasks/tasks.controller';
+import { TasksService } from '../task/services/tasks/tasks.service';
 
 @Module({
   imports: [
@@ -31,6 +33,6 @@ import { MailerModule } from 'src/mailer/mailer.module';
     ])
   ],
   providers: [UserService, UserTokenService],
-  controllers: [AuthController, ProfileController]
+  controllers: [AuthController, ProfileController, TasksController]
 })
 export class AccountModule {}
