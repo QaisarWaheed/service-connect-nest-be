@@ -32,7 +32,7 @@ export class Tasks {
   status: Status;
 
   @ApiProperty()
-  @Prop({ type: Number, min: -430, max: 20000 })
+  @Prop({ type: Number, min: -180, max: 180 })
   long: number;
 
   @ApiProperty({ type: Number })

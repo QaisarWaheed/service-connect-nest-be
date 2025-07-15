@@ -40,9 +40,10 @@ export class TasksController {
   }
 
   @Post('create-task')
-  async createTask(@Body() data: CreateTaskDto) {
+  async createTask(@Body() data: CreateTaskDto, @Req() req: Request) {
     const newTask = await this.taskService.createTask({
-      ...data
+      ...data,
+      userId: req.user._id
     });
     return newTask;
   }

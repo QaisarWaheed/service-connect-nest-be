@@ -33,4 +33,6 @@ export class CreateTaskDto {
   @Min(-430)
   @Max(~20000)
   long: number;
+
+  userId: string;
 }

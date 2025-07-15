@@ -15,7 +15,7 @@ export class TasksService {
     @InjectModel(Tasks.name) private readonly tasksModel: Model<Tasks>
   ) {}
 
-  async createTask(@Body() data: CreateTaskDto): Promise<Tasks> {
+  async createTask(data: CreateTaskDto): Promise<Tasks> {
     const createTask = await this.tasksModel.create({
       ...data
     });
