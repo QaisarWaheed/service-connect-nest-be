@@ -3,27 +3,26 @@ import {
   Controller,
   Delete,
   Get,
-  Inject,
   NotFoundException,
   Param,
   Post,
   Put,
+  Req,
   UseGuards
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+
 import { AuthGuard } from 'src/account/guards/jwt-guard/jwt-guard.guard';
 import { UserService } from 'src/account/services/user/user.service';
 import { CreateTaskDto } from 'src/task/dto/create-task/create-task';
 import { TasksService } from 'src/task/services/tasks/tasks.service';
-
+import { Request } from 'express';
+import { UpdateTaskDto } from 'src/task/dto/update-task/update-task';
 @ApiTags('Tasks')
-@UseGuards(AuthGuard)
+// @UseGuards(AuthGuard)
 @Controller('tasks')
 export class TasksController {
-  constructor(
-    private readonly taskService: TasksService,
-    private readonly userService: UserService
-  ) {}
+  constructor(private readonly taskService: TasksService) {}
 
   @Get('/get-all-tasks')
   async getAllTasks() {
@@ -40,28 +39,17 @@ export class TasksController {
   }
 
   @Post('create-task')
-  async createTask(@Body() data: CreateTaskDto, id: string) {
-    const user = await this.userService.findOneById(id);
-    if (!user) {
-      throw new NotFoundException('No Task Found with this ID');
-    }
+  async createTask(@Body() data: CreateTaskDto) {
     const newTask = await this.taskService.createTask({
-      ...data,
-      user: user._id
+      ...data
     });
+    return newTask;
   }
 
   @Put('update-task')
-  async updateTask(@Param('id') id: string, @Body() data: CreateTaskDto) {
-    const user = await this.userService.findOneById(id);
-    if (!user) {
-      throw new NotFoundException('No Task Found with this ID');
-    }
-    const newTask = await this.taskService.updateTaskById({
-      ...data,
-      user: user._id
-    });
+  async updateTask(@Req() req: Request, @Body() data: UpdateTaskDto) {
+    const newTask = await this.taskService.updateTaskById(req.user._id, data);
   }
   @Delete('delete-task')
-  async deletTask(@Param('id') id: string) {}
+  async deleteTask(@Param('id') id: string) {}
 }

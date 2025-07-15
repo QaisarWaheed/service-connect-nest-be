@@ -14,11 +14,13 @@ import { MailerModule } from 'src/mailer/mailer.module';
 import { TasksController } from '../task/controllers/tasks/tasks.controller';
 import { TasksService } from '../task/services/tasks/tasks.service';
 import TasksSchema, { Tasks } from 'src/task/entity/tasks/tasks.entity';
+import { AuthGuard } from './guards/jwt-guard/jwt-guard.guard';
 
 @Module({
   imports: [
     MailerModule,
     JwtModule.register({
+      global: true,
       secret: jwtConstants.secret
     }),
     CommonModule,
@@ -34,7 +36,8 @@ import TasksSchema, { Tasks } from 'src/task/entity/tasks/tasks.entity';
       { name: Tasks.name, schema: TasksSchema }
     ])
   ],
-  providers: [UserService, UserTokenService],
-  controllers: [AuthController, ProfileController, TasksController]
+  providers: [UserService, UserTokenService, AuthGuard, JwtService],
+  controllers: [AuthController, ProfileController],
+  exports: [AuthGuard, JwtService]
 })
 export class AccountModule {}
