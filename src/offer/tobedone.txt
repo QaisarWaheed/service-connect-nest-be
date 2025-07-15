@@ -1,0 +1,17 @@
+// create entity
+task id
+user id
+quote
+details
+
+
+
+
+//controller
+Authenticated User
+
+
+//module
+
+
+//dtos
