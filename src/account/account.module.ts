@@ -19,6 +19,7 @@ import { AuthGuard } from './guards/jwt-guard/jwt-guard.guard';
 @Module({
   imports: [
     MailerModule,
+
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret

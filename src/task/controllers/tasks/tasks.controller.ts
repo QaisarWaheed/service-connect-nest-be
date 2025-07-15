@@ -10,7 +10,7 @@ import {
   Req,
   UseGuards
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { AuthGuard } from 'src/account/guards/jwt-guard/jwt-guard.guard';
 import { UserService } from 'src/account/services/user/user.service';
@@ -19,7 +19,8 @@ import { TasksService } from 'src/task/services/tasks/tasks.service';
 import { Request } from 'express';
 import { UpdateTaskDto } from 'src/task/dto/update-task/update-task';
 @ApiTags('Tasks')
-// @UseGuards(AuthGuard)
+@UseGuards(AuthGuard)
+@ApiBearerAuth()
 @Controller('tasks')
 export class TasksController {
   constructor(private readonly taskService: TasksService) {}
@@ -30,7 +31,7 @@ export class TasksController {
   }
 
   @Get('get-task-by-id')
-  async getTaskById(id: string) {
+  async getTaskById(@Param('id') id: string) {
     const task = await this.taskService.getTaskById(id);
     if (!task) {
       throw new NotFoundException('No Task Found with this ID');

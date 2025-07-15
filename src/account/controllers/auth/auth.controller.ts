@@ -7,6 +7,7 @@ import {
   Post
 } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { jwtConstants } from 'src/account/constants/constant';
 import { AuthResponseDto } from 'src/account/dtos/auth-response.dto';
 import { CreateUserDto } from 'src/account/dtos/create-user.dto';
 import { ForgotPasswordDto } from 'src/account/dtos/forgot-password';
@@ -49,6 +50,7 @@ export class AuthController {
 
     const user = await this.userService.authenticate(data);
     console.log(user);
+    console.log('JWT Secret:', jwtConstants.secret);
     // sign user and return
     return await this.userService.signUser(user);
   }

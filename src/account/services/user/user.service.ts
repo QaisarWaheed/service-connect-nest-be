@@ -8,6 +8,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { jwtConstants } from 'src/account/constants/constant';
 import { AuthResponseDto } from 'src/account/dtos/auth-response.dto';
 import { CreateUserDto } from 'src/account/dtos/create-user.dto';
 import { LoginUserDto } from 'src/account/dtos/login.dto';
@@ -95,7 +96,9 @@ export class UserService {
       role: user.role
     };
 
-    const accessToken = await this.jwtService.signAsync(payload);
+    const accessToken = await this.jwtService.signAsync(payload, {
+      secret: jwtConstants.secret
+    });
     return { accessToken, user };
   }
 
