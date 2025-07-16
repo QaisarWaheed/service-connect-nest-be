@@ -22,7 +22,9 @@ export class OfferService {
   }
 
   async createOffer(data: CreateOfferDto) {
-    const newOffer = await this.offerModule.create({ ...data });
+    const newOffer = await this.offerModule.create(data);
+
+    console.log(newOffer);
     return newOffer;
   }
 
@@ -37,7 +39,8 @@ export class OfferService {
   }
 
   async deleteOffer(id: string): Promise<MessageDto> {
-    await this.offerModule.findByIdAndDelete(id);
+    const deleteOffer = await this.offerModule.findByIdAndDelete(id);
+    if (!deleteOffer) throw new NotFoundException();
     return { message: 'deleted Successfully' };
   }
 }

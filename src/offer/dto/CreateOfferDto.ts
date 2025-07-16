@@ -1,13 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsEmpty, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateOfferDto {
   taskId: string;
 
   @ApiProperty()
-  offerDetails: string;
+  @IsEmpty()
+  @IsString()
+  offerDescription: string;
 
   @ApiProperty()
-  offerPrice: number;
+  @IsEmpty()
+  @IsString()
+  priceOffered: number;
 
   userId: string;
 }

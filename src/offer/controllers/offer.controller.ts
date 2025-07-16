@@ -34,10 +34,12 @@ export class OfferController {
 
   @Post('/create-offer')
   async createOffer(@Body() data: CreateOfferDto, @Req() req: Request) {
-    return await this.offerService.createOffer({
+    const offer = await this.offerService.createOffer({
       ...data,
       userId: req.user._id
     });
+    console.log(offer);
+    return offer;
   }
 
   @Put('/update-offer')

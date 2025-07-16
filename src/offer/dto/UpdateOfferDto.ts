@@ -4,10 +4,10 @@ export class UpdateOfferDto {
   taskId: string;
 
   @ApiProperty()
-  offerDetails: string;
+  offerDescription: string;
 
   @ApiProperty()
-  offerPrice: number;
+  priceOffered: number;
 
   userId: string;
 }

@@ -5,10 +5,10 @@ import mongoose from 'mongoose';
 export class Offer {
   declare _id: mongoose.Schema.Types.ObjectId;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', unique: true })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   userId: mongoose.Schema.Types.ObjectId;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Tasks', unique: true })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Tasks' })
   taskId: mongoose.Schema.Types.ObjectId;
 
   @Prop()
