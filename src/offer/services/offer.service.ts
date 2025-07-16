@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { Tasks } from 'src/task/entity/tasks.entity';
 import { Offer } from '../entities/offer.entity';
 import { TasksService } from 'src/task/services/tasks/tasks.service';
+import { MessageDto } from 'src/common/dtos/message.dto';
 
 @Injectable()
 export class OfferService {
@@ -23,5 +24,10 @@ export class OfferService {
 
   async createOffer() {
     // const findTask = await this.taskService.getTaskById({id:string});
+  }
+
+  async deleteOffer(id: string): Promise<MessageDto> {
+    await this.offerModule.findByIdAndDelete(id);
+    return { message: 'deleted Successfully' };
   }
 }

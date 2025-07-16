@@ -16,6 +16,9 @@ export class Offer {
 
   @Prop()
   priceOffered: number;
+
+  declare createdAt: Date;
+  declare updatedAt: Date;
 }
 const OfferSchema = SchemaFactory.createForClass(Offer);
 export default OfferSchema;
