@@ -13,7 +13,7 @@ import { jwtConstants } from './constants/constant';
 import { MailerModule } from 'src/mailer/mailer.module';
 import { TasksController } from '../task/controllers/tasks/tasks.controller';
 import { TasksService } from '../task/services/tasks/tasks.service';
-import TasksSchema, { Tasks } from 'src/task/entity/tasks/tasks.entity';
+import TasksSchema, { Tasks } from 'src/task/entity/tasks.entity';
 import { AuthGuard } from './guards/jwt-guard/jwt-guard.guard';
 
 @Module({

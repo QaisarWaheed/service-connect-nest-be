@@ -1,4 +1,10 @@
-import { Body, Injectable, NotFoundException, Req } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Injectable,
+  NotFoundException,
+  Req
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Request } from 'express';
 
@@ -7,7 +13,7 @@ import { Model } from 'mongoose';
 import { MessageDto } from 'src/common/dtos/message.dto';
 import { CreateTaskDto } from 'src/task/dto/create-task/create-task';
 import { UpdateTaskDto } from 'src/task/dto/update-task/update-task';
-import { Tasks } from 'src/task/entity/tasks/tasks.entity';
+import { Tasks } from 'src/task/entity/tasks.entity';
 
 @Injectable()
 export class TasksService {
@@ -16,42 +22,62 @@ export class TasksService {
   ) {}
 
   async createTask(data: CreateTaskDto): Promise<Tasks> {
-    const createTask = await this.tasksModel.create({
-      ...data
-    });
+    try {
+      const createTask = await this.tasksModel.create({
+        ...data
+      });
 
-    return createTask;
+      return createTask;
+    } catch (e) {
+      throw new BadRequestException('Some thing went wrong');
+    }
   }
 
   async getTask(): Promise<Tasks[]> {
-    const Tasks = await this.tasksModel.find();
-    return Tasks;
+    try {
+      const Tasks = await this.tasksModel.find();
+      return Tasks;
+    } catch (e) {
+      throw new NotFoundException('No tasks found');
+    }
   }
 
   async getTaskById(userId: string): Promise<Tasks | null> {
-    const getTask = await this.tasksModel.findById({ id: userId });
-    if (!getTask) {
-      throw new NotFoundException('No Task Found with this Id');
+    try {
+      const getTask = await this.tasksModel.findById({ id: userId });
+      if (!getTask) {
+        throw new NotFoundException('No Task Found with this Id');
+      }
+      return getTask;
+    } catch (e) {
+      throw new NotFoundException('No task found against this ID');
     }
-    return getTask;
   }
 
   async updateTaskById(id: string, data: UpdateTaskDto): Promise<Tasks | null> {
-    const getAndUpdateTask = await this.tasksModel.findByIdAndUpdate(
-      {
-        id
-      },
-      { ...data },
-      { new: true }
-    );
-    if (!getAndUpdateTask) {
-      throw new NotFoundException('No Task found against this Id');
+    try {
+      const getAndUpdateTask = await this.tasksModel.findByIdAndUpdate(
+        {
+          id
+        },
+        { ...data },
+        { new: true }
+      );
+      if (!getAndUpdateTask) {
+        throw new NotFoundException('No Task found against this Id');
+      }
+      return getAndUpdateTask;
+    } catch (e) {
+      throw new BadRequestException('Some thing went wrong');
     }
-    return getAndUpdateTask;
   }
 
   async deleteTaskById(@Req() req: Request, id: string): Promise<MessageDto> {
-    await this.tasksModel.findByIdAndDelete(id);
-    return { message: 'Task Deleted Successfully' };
+    try {
+      await this.tasksModel.findByIdAndDelete(id);
+      return { message: 'Task Deleted Successfully' };
+    } catch (e) {
+      throw new NotFoundException('No task found against this ID');
+    }
   }
 }
