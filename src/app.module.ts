@@ -9,7 +9,6 @@ import { TaskModule } from './task/task.module';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './account/constants/constant';
 import { OfferModule } from './offer/offer.module';
-import { OfferController } from './controllers/offer/offer.controller';
 
 @Module({
   imports: [
@@ -23,7 +22,7 @@ import { OfferController } from './controllers/offer/offer.controller';
     TaskModule,
     OfferModule
   ],
-  controllers: [OfferController],
+  controllers: [],
   providers: []
 })
 export class AppModule {}

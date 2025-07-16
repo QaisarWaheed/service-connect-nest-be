@@ -1,16 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Tasks } from 'src/task/entity/tasks.entity';
 import { Offer } from '../entities/offer.entity';
-import { TasksService } from 'src/task/services/tasks/tasks.service';
 import { MessageDto } from 'src/common/dtos/message.dto';
+import { CreateOfferDto } from '../dto/CreateOfferDto';
+import { UpdateOfferDto } from '../dto/UpdateOfferDto';
 
 @Injectable()
 export class OfferService {
   constructor(
-    @InjectModel(Offer.name) private readonly offerModule: Model<Offer>,
-    private readonly taskService: TasksService
+    @InjectModel(Offer.name) private readonly offerModule: Model<Offer>
   ) {}
 
   async getOffers(): Promise<Offer[]> {
@@ -22,8 +21,19 @@ export class OfferService {
     return offer;
   }
 
-  async createOffer() {
-    // const findTask = await this.taskService.getTaskById({id:string});
+  async createOffer(data: CreateOfferDto) {
+    const newOffer = await this.offerModule.create({ ...data });
+    return newOffer;
+  }
+
+  async updateOffer(id: string, data: UpdateOfferDto) {
+    const updatedOffer = await this.offerModule.findByIdAndUpdate(id, {
+      ...data
+    });
+    if (!updatedOffer) {
+      throw new NotFoundException('No Offer found to update');
+    }
+    return updatedOffer;
   }
 
   async deleteOffer(id: string): Promise<MessageDto> {
