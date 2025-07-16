@@ -1,6 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 
+export enum OfferStatus {
+  Pending = 'Pending',
+  Rejected = 'Rejected',
+  Accepted = 'Accepted',
+  Countered = 'Countered'
+}
+
 @Schema({ timestamps: true })
 export class Offer {
   declare _id: mongoose.Schema.Types.ObjectId;
@@ -16,6 +23,12 @@ export class Offer {
 
   @Prop()
   priceOffered: number;
+
+  @Prop({ enum: OfferStatus, default: OfferStatus.Pending })
+  offerStatus: OfferStatus;
+
+  @Prop()
+  counterOfferId?: string;
 
   declare createdAt: Date;
   declare updatedAt: Date;

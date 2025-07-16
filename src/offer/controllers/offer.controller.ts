@@ -15,6 +15,8 @@ import { OfferService } from '../services/offer.service';
 import { CreateOfferDto } from '../dto/CreateOfferDto';
 import { Request } from 'express';
 import { UpdateOfferDto } from '../dto/UpdateOfferDto';
+import { UpdateOfferStatusDto } from '../dto/UpdateOfferSatusDto';
+
 @ApiTags('Offer')
 @UseGuards(AuthGuard)
 @ApiBearerAuth()
@@ -27,7 +29,7 @@ export class OfferController {
     return await this.offerService.getOffers();
   }
 
-  @Get('/get-offer-by-id')
+  @Get('/:id')
   async getOfferById(@Param('id') id: string) {
     return await this.offerService.getOfferById(id);
   }
@@ -42,12 +44,23 @@ export class OfferController {
     return offer;
   }
 
-  @Put('/update-offer')
+  @Put('/:id')
   async updateOffer(@Param('id') id: string, @Body() data: UpdateOfferDto) {
     return await this.offerService.updateOffer(id, { ...data });
   }
 
-  @Delete('/delete-offer')
+  @Put('/accept-or-reject/:id')
+  async acceptOrRejectOffer(
+    @Param('id') id: string,
+    @Body() data: UpdateOfferStatusDto
+  ) {
+    const offer = this.offerService.acceptOrRejectOffer(id, {
+      ...data,
+      offerStatus: data.offerStatus
+    });
+    return offer;
+  }
+  @Delete('/:id')
   async deleteOffer(@Param('id') id: string) {
     return await this.offerService.deleteOffer(id);
   }
