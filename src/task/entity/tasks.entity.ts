@@ -6,7 +6,8 @@ import mongoose from 'mongoose';
 export enum Status {
   Pending = 'Pending',
   Completed = 'Completed',
-  Cancelled = 'Cancelled'
+  Cancelled = 'Cancelled',
+  Revision = 'Revision'
 }
 
 @Schema({
@@ -29,7 +30,7 @@ export class Tasks {
 
   @ApiProperty({ enum: Status })
   @Prop({ enum: Status, default: Status.Pending })
-  status: Status;
+  taskStatus: Status;
 
   @ApiProperty()
   @Prop({ type: Number, min: -180, max: 180 })
@@ -40,7 +41,7 @@ export class Tasks {
   lat: number;
 
   @ApiProperty({ type: String })
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', unique: true })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   userId: mongoose.Schema.Types.ObjectId;
 
   declare createdAt: Date;

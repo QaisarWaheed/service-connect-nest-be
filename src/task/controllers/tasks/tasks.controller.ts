@@ -18,6 +18,7 @@ import { CreateTaskDto } from 'src/task/dto/create-task/create-task';
 import { TasksService } from 'src/task/services/tasks/tasks.service';
 import { Request } from 'express';
 import { UpdateTaskDto } from 'src/task/dto/update-task/update-task';
+import { UpdateTaskStatus } from 'src/task/dto/UpdateTaskStatus';
 @ApiTags('Tasks')
 @UseGuards(AuthGuard)
 @ApiBearerAuth()
@@ -30,7 +31,7 @@ export class TasksController {
     return this.taskService.getTask();
   }
 
-  @Get('get-task-by-id')
+  @Get('/get-task-by-id/:id')
   async getTaskById(@Param('id') id: string) {
     const task = await this.taskService.getTaskById(id);
     if (!task) {
@@ -52,6 +53,19 @@ export class TasksController {
   async updateTask(@Req() req: Request, @Body() data: UpdateTaskDto) {
     const newTask = await this.taskService.updateTaskById(req.user._id, data);
   }
+
+  @Put('update-task-status/:id')
+  async updateTaskStatus(
+    @Req() req: Request,
+    @Body() data: UpdateTaskStatus,
+    @Param('id') id: string
+  ) {
+    return await this.taskService.updateTaskStatus(id, {
+      ...data,
+      userId: req.user._id
+    });
+  }
+
   @Delete('delete-task')
   async deleteTask(@Param('id') id: string) {}
 }

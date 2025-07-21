@@ -13,6 +13,7 @@ import { Model } from 'mongoose';
 import { MessageDto } from 'src/common/dtos/message.dto';
 import { CreateTaskDto } from 'src/task/dto/create-task/create-task';
 import { UpdateTaskDto } from 'src/task/dto/update-task/update-task';
+import { UpdateTaskStatus } from 'src/task/dto/UpdateTaskStatus';
 import { Tasks } from 'src/task/entity/tasks.entity';
 
 @Injectable()
@@ -42,12 +43,10 @@ export class TasksService {
     }
   }
 
-  async getTaskById(userId: string): Promise<Tasks | null> {
+  async getTaskById(taskId: string): Promise<Tasks | null> {
     try {
-      const getTask = await this.tasksModel.findById({ id: userId });
-      if (!getTask) {
-        throw new NotFoundException('No Task Found with this Id');
-      }
+      const getTask = await this.tasksModel.findById(taskId);
+
       return getTask;
     } catch (e) {
       throw new NotFoundException('No task found against this ID');
@@ -70,6 +69,17 @@ export class TasksService {
     } catch (e) {
       throw new BadRequestException('Some thing went wrong');
     }
+  }
+
+  async updateTaskStatus(
+    id: string,
+    data: UpdateTaskStatus
+  ): Promise<Tasks | null> {
+    const task = await this.tasksModel.findByIdAndUpdate(id, { ...data });
+    if (!task) {
+      throw new NotFoundException();
+    }
+    return task;
   }
 
   async deleteTaskById(@Req() req: Request, id: string): Promise<MessageDto> {
