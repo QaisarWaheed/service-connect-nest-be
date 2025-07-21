@@ -9,6 +9,7 @@ import { TaskModule } from './task/task.module';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './account/constants/constant';
 import { OfferModule } from './offer/offer.module';
+import { ReviewModule } from './review/review.module';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { OfferModule } from './offer/offer.module';
     MongooseModule.forRoot('mongodb://127.0.0.1:27017/service'),
     CommonModule,
     TaskModule,
-    OfferModule
+    OfferModule,
+    ReviewModule
   ],
   controllers: [],
   providers: []
