@@ -52,13 +52,18 @@ export class OfferController {
   @Put('/accept-or-reject/:id')
   async acceptOrRejectOffer(
     @Param('id') id: string,
-    @Body() data: UpdateOfferStatusDto
+    @Body() data: UpdateOfferStatusDto,
+    UpdateSellerId: UpdateOfferDto
   ) {
-    const offer = this.offerService.acceptOrRejectOffer(id, {
-      ...data,
-      offerStatus: data.offerStatus
-    });
-    return offer;
+    //some thing to do here
+    // const offer = this.offerService.acceptOrRejectOffer(
+    //   id,
+    //   {
+    //     ...data,
+    //     offerStatus: data.offerStatus
+    //   }
+    // );
+    // return offer;
   }
   @Delete('/:id')
   async deleteOffer(@Param('id') id: string) {

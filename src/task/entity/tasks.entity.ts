@@ -40,9 +40,14 @@ export class Tasks {
   @Prop({ type: Number, min: -90, max: +90 })
   lat: number;
 
+  //this is buyer Id
   @ApiProperty({ type: String })
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   userId: mongoose.Schema.Types.ObjectId;
+
+  @ApiProperty()
+  @Prop()
+  sellerId: string;
 
   declare createdAt: Date;
   declare updatedAt: Date;

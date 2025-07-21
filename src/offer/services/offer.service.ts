@@ -6,11 +6,14 @@ import { MessageDto } from 'src/common/dtos/message.dto';
 import { CreateOfferDto } from '../dto/CreateOfferDto';
 import { UpdateOfferDto } from '../dto/UpdateOfferDto';
 import { UpdateOfferStatusDto } from '../dto/UpdateOfferSatusDto';
+import { Tasks } from 'src/task/entity/tasks.entity';
+import { UpdateTaskDto } from 'src/task/dto/update-task/update-task';
 
 @Injectable()
 export class OfferService {
   constructor(
-    @InjectModel(Offer.name) private readonly offerModule: Model<Offer>
+    @InjectModel(Offer.name) private readonly offerModule: Model<Offer>,
+    @InjectModel(Tasks.name) private readonly taskModule: Model<Tasks>
   ) {}
 
   async getOffers(): Promise<Offer[]> {
@@ -44,7 +47,11 @@ export class OfferService {
     }
     return updatedOffer;
   }
-  async acceptOrRejectOffer(id: string, data: UpdateOfferStatusDto) {
+  async acceptOrRejectOffer(
+    id: string,
+    data: UpdateOfferStatusDto,
+    updateSeller: UpdateTaskDto
+  ) {
     const offer = await this.offerModule.findByIdAndUpdate(
       id,
       {
@@ -52,6 +59,9 @@ export class OfferService {
       },
       { new: true }
     );
+    if (offer?.offerStatus === 'Accepted') {
+      await this.taskModule.findByIdAndUpdate(data.taskId, { ...updateSeller });
+    }
     return offer;
   }
   async deleteOffer(id: string): Promise<MessageDto> {
