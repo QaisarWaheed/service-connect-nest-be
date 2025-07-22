@@ -46,7 +46,7 @@ export class TasksService {
   async getTaskById(taskId: string): Promise<Tasks | null> {
     try {
       const getTask = await this.tasksModel.findById(taskId);
-
+      console.log(getTask?.sellerId);
       return getTask;
     } catch (e) {
       throw new NotFoundException('No task found against this ID');
@@ -69,6 +69,11 @@ export class TasksService {
     } catch (e) {
       throw new BadRequestException('Some thing went wrong');
     }
+  }
+
+  async updateSellerId(id: string, sellerId: string) {
+    const seller = await this.tasksModel.findByIdAndUpdate(id, { sellerId });
+    return seller;
   }
 
   async updateTaskStatus(

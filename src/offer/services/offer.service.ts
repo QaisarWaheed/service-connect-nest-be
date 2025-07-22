@@ -7,7 +7,7 @@ import { CreateOfferDto } from '../dto/CreateOfferDto';
 import { UpdateOfferDto } from '../dto/UpdateOfferDto';
 import { UpdateOfferStatusDto } from '../dto/UpdateOfferSatusDto';
 import { Tasks } from 'src/task/entity/tasks.entity';
-import { UpdateTaskDto } from 'src/task/dto/update-task/update-task';
+import { UpdateSellerDto } from 'src/task/dto/update-task/updateSeller';
 
 @Injectable()
 export class OfferService {
@@ -47,11 +47,8 @@ export class OfferService {
     }
     return updatedOffer;
   }
-  async acceptOrRejectOffer(
-    id: string,
-    data: UpdateOfferStatusDto,
-    updateSeller: UpdateTaskDto
-  ) {
+
+  async acceptOrRejectOffer(id: string, data: UpdateOfferStatusDto) {
     const offer = await this.offerModule.findByIdAndUpdate(
       id,
       {
@@ -59,11 +56,10 @@ export class OfferService {
       },
       { new: true }
     );
-    if (offer?.offerStatus === 'Accepted') {
-      await this.taskModule.findByIdAndUpdate(data.taskId, { ...updateSeller });
-    }
+
     return offer;
   }
+
   async deleteOffer(id: string): Promise<MessageDto> {
     const deleteOffer = await this.offerModule.findByIdAndDelete(id);
     if (!deleteOffer) throw new NotFoundException();

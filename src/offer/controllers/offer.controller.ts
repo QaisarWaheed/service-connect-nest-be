@@ -16,13 +16,18 @@ import { CreateOfferDto } from '../dto/CreateOfferDto';
 import { Request } from 'express';
 import { UpdateOfferDto } from '../dto/UpdateOfferDto';
 import { UpdateOfferStatusDto } from '../dto/UpdateOfferSatusDto';
+import { UpdateSellerDto } from 'src/task/dto/update-task/updateSeller';
+import { TasksService } from 'src/task/services/tasks/tasks.service';
 
 @ApiTags('Offer')
 @UseGuards(AuthGuard)
 @ApiBearerAuth()
 @Controller('offer')
 export class OfferController {
-  constructor(private readonly offerService: OfferService) {}
+  constructor(
+    private readonly offerService: OfferService,
+    private readonly taskService: TasksService
+  ) {}
 
   @Get('/all-offers')
   async allOffers() {
@@ -52,18 +57,27 @@ export class OfferController {
   @Put('/accept-or-reject/:id')
   async acceptOrRejectOffer(
     @Param('id') id: string,
-    @Body() data: UpdateOfferStatusDto,
-    UpdateSellerId: UpdateOfferDto
+    @Body() data: UpdateOfferStatusDto
   ) {
     //some thing to do here
-    // const offer = this.offerService.acceptOrRejectOffer(
-    //   id,
-    //   {
-    //     ...data,
-    //     offerStatus: data.offerStatus
-    //   }
-    // );
-    // return offer;
+
+    const offer = await this.offerService.acceptOrRejectOffer(id, {
+      ...data,
+      offerStatus: data.offerStatus
+    });
+    if (offer) {
+      const task = await this.taskService.getTaskById(offer.taskId.toString());
+
+      if (task && offer.offerStatus === 'Accepted') {
+        this.taskService.updateSellerId(
+          offer.taskId.toString(),
+
+          (task.sellerId = offer.userId.toString())
+        );
+      }
+    }
+
+    return offer;
   }
   @Delete('/:id')
   async deleteOffer(@Param('id') id: string) {
