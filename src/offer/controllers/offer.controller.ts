@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   Req,
+  UnauthorizedException,
   UseGuards
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -16,8 +17,15 @@ import { CreateOfferDto } from '../dto/CreateOfferDto';
 import { Request } from 'express';
 import { UpdateOfferDto } from '../dto/UpdateOfferDto';
 import { UpdateOfferStatusDto } from '../dto/UpdateOfferSatusDto';
-import { UpdateSellerDto } from 'src/task/dto/update-task/updateSeller';
 import { TasksService } from 'src/task/services/tasks/tasks.service';
+
+enum Status {
+  Pending = 'Pending',
+  Active = 'Active',
+  Completed = 'Completed',
+  Cancelled = 'Cancelled',
+  Revision = 'Revision'
+}
 
 @ApiTags('Offer')
 @UseGuards(AuthGuard)
@@ -41,6 +49,9 @@ export class OfferController {
 
   @Post('/create-offer')
   async createOffer(@Body() data: CreateOfferDto, @Req() req: Request) {
+    if (req.user.role !== 'Seller') {
+      throw new UnauthorizedException('A Buyer cannot create an Offer');
+    }
     const offer = await this.offerService.createOffer({
       ...data,
       userId: req.user._id
@@ -50,7 +61,14 @@ export class OfferController {
   }
 
   @Put('/:id')
-  async updateOffer(@Param('id') id: string, @Body() data: UpdateOfferDto) {
+  async updateOffer(
+    @Param('id') id: string,
+    @Body() data: UpdateOfferDto,
+    @Req() req: Request
+  ) {
+    if (req.user.role !== 'Seller') {
+      throw new UnauthorizedException('A Buyer cannot udpate an Offer');
+    }
     return await this.offerService.updateOffer(id, { ...data });
   }
 
@@ -72,7 +90,8 @@ export class OfferController {
         this.taskService.updateSellerId(
           offer.taskId.toString(),
 
-          (task.sellerId = offer.userId.toString())
+          (task.sellerId = offer.userId.toString()),
+          (task.taskStatus = Status.Active)
         );
       }
     }

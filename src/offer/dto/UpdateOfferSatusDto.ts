@@ -5,5 +5,6 @@ export class UpdateOfferStatusDto {
   @ApiProperty()
   offerStatus: OfferStatus;
 
+  taskStatus: string;
   taskId: string;
 }

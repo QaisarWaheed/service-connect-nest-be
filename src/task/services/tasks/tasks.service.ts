@@ -1,6 +1,5 @@
 import {
   BadRequestException,
-  Body,
   Injectable,
   NotFoundException,
   Req
@@ -14,7 +13,7 @@ import { MessageDto } from 'src/common/dtos/message.dto';
 import { CreateTaskDto } from 'src/task/dto/create-task/create-task';
 import { UpdateTaskDto } from 'src/task/dto/update-task/update-task';
 import { UpdateTaskStatus } from 'src/task/dto/UpdateTaskStatus';
-import { Tasks } from 'src/task/entity/tasks.entity';
+import { Status, Tasks } from 'src/task/entity/tasks.entity';
 
 @Injectable()
 export class TasksService {
@@ -71,8 +70,11 @@ export class TasksService {
     }
   }
 
-  async updateSellerId(id: string, sellerId: string) {
-    const seller = await this.tasksModel.findByIdAndUpdate(id, { sellerId });
+  async updateSellerId(id: string, sellerId: string, taskStatus: Status) {
+    const seller = await this.tasksModel.findByIdAndUpdate(id, {
+      sellerId,
+      taskStatus
+    });
     return seller;
   }
 
@@ -80,11 +82,26 @@ export class TasksService {
     id: string,
     data: UpdateTaskStatus
   ): Promise<Tasks | null> {
-    const task = await this.tasksModel.findByIdAndUpdate(id, { ...data });
+    const task = await this.tasksModel.findByIdAndUpdate(
+      id,
+      { ...data },
+      { new: true }
+    );
     if (!task) {
       throw new NotFoundException();
     }
     return task;
+  }
+
+  async delieverTask(id: string) {
+    const task = await this.tasksModel.findByIdAndUpdate(
+      id,
+      { delivered: true },
+      { new: true }
+    );
+    if (!task) {
+      throw new NotFoundException('No task Found');
+    }
   }
 
   async deleteTaskById(@Req() req: Request, id: string): Promise<MessageDto> {

@@ -13,8 +13,8 @@ export type AuthUser = {
 };
 
 export enum Role {
-  SuperAdmin = 'Super Admin',
-  StandardUser = 'Standard User'
+  Buyer = 'Buyer',
+  Seller = 'Seller'
 }
 
 @Schema({ timestamps: true })
@@ -35,7 +35,7 @@ export class User extends Entity {
   passwordHash: string;
 
   @ApiProperty({ enum: Role, enumName: 'Role' })
-  @Prop({ enum: Role, default: Role.StandardUser })
+  @Prop({ enum: Role, default: Role.Buyer })
   role: Role;
 
   @ApiProperty()

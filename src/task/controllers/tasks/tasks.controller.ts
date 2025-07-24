@@ -8,12 +8,12 @@ import {
   Post,
   Put,
   Req,
+  UnauthorizedException,
   UseGuards
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { AuthGuard } from 'src/account/guards/jwt-guard/jwt-guard.guard';
-import { UserService } from 'src/account/services/user/user.service';
 import { CreateTaskDto } from 'src/task/dto/create-task/create-task';
 import { TasksService } from 'src/task/services/tasks/tasks.service';
 import { Request } from 'express';
@@ -42,6 +42,9 @@ export class TasksController {
 
   @Post('create-task')
   async createTask(@Body() data: CreateTaskDto, @Req() req: Request) {
+    if (req.user.role !== 'Buyer') {
+      throw new UnauthorizedException('A seller cannot create an Offer');
+    }
     const newTask = await this.taskService.createTask({
       ...data,
       userId: req.user._id
@@ -51,6 +54,9 @@ export class TasksController {
 
   @Put('update-task')
   async updateTask(@Req() req: Request, @Body() data: UpdateTaskDto) {
+    if (req.user.role !== 'Buyer') {
+      throw new UnauthorizedException('A seller cannot update an Offer');
+    }
     const newTask = await this.taskService.updateTaskById(req.user._id, data);
   }
 
@@ -60,12 +66,25 @@ export class TasksController {
     @Body() data: UpdateTaskStatus,
     @Param('id') id: string
   ) {
+    if (req.user.role !== 'Buyer') {
+      throw new UnauthorizedException('A seller cannot create an Offer');
+    }
     return await this.taskService.updateTaskStatus(id, {
       ...data,
       userId: req.user._id
     });
   }
 
+  @Put('/deliever-task/:id')
+  async delieverTask(@Param('id') id: string) {
+    return await this.taskService.delieverTask(id);
+  }
+
   @Delete('delete-task')
-  async deleteTask(@Param('id') id: string) {}
+  async deleteTask(@Param('id') id: string, @Req() req: Request) {
+    if (req.user.role !== 'Buyer') {
+      throw new UnauthorizedException('A seller cannot create an Offer');
+    }
+    return { message: 'deleted Successfuly' };
+  }
 }

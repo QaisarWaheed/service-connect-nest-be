@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 
 export enum Status {
   Pending = 'Pending',
+  Active = 'Active',
   Completed = 'Completed',
   Cancelled = 'Cancelled',
   Revision = 'Revision'
@@ -44,6 +45,10 @@ export class Tasks {
   @ApiProperty({ type: String })
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   userId: mongoose.Schema.Types.ObjectId;
+
+  @ApiProperty()
+  @Prop()
+  delivered: boolean;
 
   @ApiProperty()
   @Prop()
