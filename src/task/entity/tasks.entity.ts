@@ -54,6 +54,14 @@ export class Tasks {
   @Prop()
   sellerId: string;
 
+  @ApiProperty()
+  @Prop()
+  buyerReview: string;
+
+  @ApiProperty()
+  @Prop()
+  sellerReview: string;
+
   declare createdAt: Date;
   declare updatedAt: Date;
 }

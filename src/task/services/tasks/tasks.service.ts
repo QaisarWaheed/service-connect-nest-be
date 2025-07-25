@@ -10,6 +10,8 @@ import { Request } from 'express';
 import { Model } from 'mongoose';
 
 import { MessageDto } from 'src/common/dtos/message.dto';
+import { CreateBuyerReview } from 'src/review/dtos/CreateBuyerReview.dto';
+import { CreateSellerReviewDto } from 'src/review/dtos/CreateSellerReviewDto';
 import { CreateTaskDto } from 'src/task/dto/create-task/create-task';
 import { UpdateTaskDto } from 'src/task/dto/update-task/update-task';
 import { UpdateTaskStatus } from 'src/task/dto/UpdateTaskStatus';
@@ -35,8 +37,10 @@ export class TasksService {
 
   async getTask(): Promise<Tasks[]> {
     try {
-      const Tasks = await this.tasksModel.find();
-      return Tasks;
+      const tasks = await this.tasksModel
+        .find()
+        .select('+buyerReview +sellerReview');
+      return tasks;
     } catch (e) {
       throw new NotFoundException('No tasks found');
     }
@@ -58,6 +62,38 @@ export class TasksService {
         {
           id
         },
+        { ...data },
+        { new: true }
+      );
+      if (!getAndUpdateTask) {
+        throw new NotFoundException('No Task found against this Id');
+      }
+      return getAndUpdateTask;
+    } catch (e) {
+      throw new BadRequestException('Some thing went wrong');
+    }
+  }
+
+  async updateBuyerReview(id: string, data: CreateBuyerReview) {
+    try {
+      const getAndUpdateTask = await this.tasksModel.findByIdAndUpdate(
+        id,
+        { ...data },
+        { new: true }
+      );
+      if (!getAndUpdateTask) {
+        throw new NotFoundException('No Task found against this Id');
+      }
+      return getAndUpdateTask;
+    } catch (e) {
+      throw new BadRequestException(e);
+    }
+  }
+
+  async updateSellerReview(id: string, data: CreateSellerReviewDto) {
+    try {
+      const getAndUpdateTask = await this.tasksModel.findByIdAndUpdate(
+        id,
         { ...data },
         { new: true }
       );

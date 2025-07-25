@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -19,6 +20,8 @@ import { TasksService } from 'src/task/services/tasks/tasks.service';
 import { Request } from 'express';
 import { UpdateTaskDto } from 'src/task/dto/update-task/update-task';
 import { UpdateTaskStatus } from 'src/task/dto/UpdateTaskStatus';
+import { Status } from 'src/task/entity/tasks.entity';
+
 @ApiTags('Tasks')
 @UseGuards(AuthGuard)
 @ApiBearerAuth()
@@ -55,9 +58,9 @@ export class TasksController {
   @Put('update-task')
   async updateTask(@Req() req: Request, @Body() data: UpdateTaskDto) {
     if (req.user.role !== 'Buyer') {
-      throw new UnauthorizedException('A seller cannot update an Offer');
+      throw new UnauthorizedException('A seller cannot update a Task');
     }
-    const newTask = await this.taskService.updateTaskById(req.user._id, data);
+    return await this.taskService.updateTaskById(req.user._id, data);
   }
 
   @Put('update-task-status/:id')
@@ -67,17 +70,37 @@ export class TasksController {
     @Param('id') id: string
   ) {
     if (req.user.role !== 'Buyer') {
-      throw new UnauthorizedException('A seller cannot create an Offer');
+      throw new UnauthorizedException('A seller cannot update the Task Status');
     }
-    return await this.taskService.updateTaskStatus(id, {
+
+    const task = await this.taskService.getTaskById(id);
+
+    if (['Completed', 'Revision'].includes(data.taskStatus)) {
+      if (!task?.delivered) {
+        throw new BadRequestException(
+          'You cannot change status to Completed or Revision unless seller delivers the order'
+        );
+      }
+
+      return this.taskService.updateTaskStatus(id, {
+        taskStatus: Status.Completed,
+        userId: req.user._id
+      });
+    }
+
+    return this.taskService.updateTaskStatus(id, {
       ...data,
       userId: req.user._id
     });
   }
-
   @Put('/deliever-task/:id')
-  async delieverTask(@Param('id') id: string) {
-    return await this.taskService.delieverTask(id);
+  async delieverTask(@Param('id') id: string, @Req() req: Request) {
+    if (req.user.role !== 'Seller') {
+      throw new UnauthorizedException('Buyer Cannot deliever the order');
+    }
+
+    await this.taskService.delieverTask(id);
+    return { message: 'task Delivered' };
   }
 
   @Delete('delete-task')
