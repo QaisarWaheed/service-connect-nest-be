@@ -81,7 +81,7 @@ export class UserService {
     );
 
     if (!isValid) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('email or password is in correct');
     }
 
     return user;
