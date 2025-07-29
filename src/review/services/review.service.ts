@@ -49,11 +49,10 @@ export class ReviewService {
     if (data.ratings > 5) {
       throw new BadRequestException('rating cannot be greater than 5');
     }
-    return await this.reviewModel.create({ ...data, ratings: data.ratings });
+    return await this.reviewModel.create({ ...data });
   }
 
   async createBuyerReview(data: CreateBuyerReview): Promise<Review> {
-    console.log(data.taskId);
     const task = await this.taskService.getTaskById(data.taskId);
     if (!task) {
       throw new NotFoundException('cannot found Task');
@@ -71,6 +70,6 @@ export class ReviewService {
     if (data.ratings > 5) {
       throw new BadRequestException('rating cannot be greater than 5');
     }
-    return await this.reviewModel.create({ ...data, ratings: data.ratings });
+    return await this.reviewModel.create({ ...data });
   }
 }
